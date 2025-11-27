@@ -12,6 +12,10 @@ export async function Footer() {
   const footerData: Footer = await getCachedGlobal('footer', 1)()
 
   const navItems = footerData?.navItems || []
+  const footerAny = footerData as any
+  const icpRecord = footerAny?.icpRecord
+  const icpHolderName = footerAny?.icpHolderName
+  const icpDomain = footerAny?.icpDomain
 
   return (
     <footer className="mt-auto border-t border-border bg-black dark:bg-card text-white">
@@ -28,7 +32,22 @@ export async function Footer() {
             })}
           </nav>
         </div>
-      </div>
+  </div>
+      {(icpRecord || icpHolderName || icpDomain) && (
+        <div className="container border-t border-border py-3 text-sm text-gray-400">
+          <div className="flex flex-col md:flex-row md:justify-between gap-2">
+            <div>
+              {icpHolderName && <span className="mr-2">{icpHolderName}</span>}
+              {icpRecord && <span className="mr-2">备案号：{icpRecord}</span>}
+            </div>
+            {icpDomain && (
+              <div className="md:text-right">
+                <span>{icpDomain}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </footer>
   )
 }

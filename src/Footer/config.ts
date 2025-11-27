@@ -25,6 +25,21 @@ export const Footer: GlobalConfig = {
         },
       },
     },
+    {
+      name: 'icpRecord',
+      label: 'ICP备案/许可证号',
+      type: 'text',
+    },
+    {
+      name: 'icpHolderName',
+      label: '主体单位名称',
+      type: 'text',
+    },
+    {
+      name: 'icpDomain',
+      label: '网站域名',
+      type: 'text',
+    },
   ],
   hooks: {
     afterChange: [revalidateFooter],
