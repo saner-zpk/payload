@@ -1,0 +1,57 @@
+name: Build and Push Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Alibaba Cloud Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.ALIYUN_REGISTRY }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.ALIYUN_REGISTRY }}/${{ secrets.ALIYUN_REPOSITORY }}:${{ github.event.inputs.tag || github.ref_name || 'latest' }}
+          file: ./Dockerfile
+
+      - name: Image info
+        run: |
+          echo "Pushed image: ${{ secrets.ALIYUN_REGISTRY }}/${{ secrets.ALIYUN_REPOSITORY }}:${{ github.event.inputs.tag || github.ref_name || 'latest' }}"
+
+      - name: Notify 1Panel (optional)
+        if: ${{ secrets.ONEPANEL_WEBHOOK != '' }}
+        env:
+          IMAGE: ${{ secrets.ALIYUN_REGISTRY }}/${{ secrets.ALIYUN_REPOSITORY }}:${{ github.event.inputs.tag || github.ref_name || 'latest' }}
+          ONEPANEL_WEBHOOK: ${{ secrets.ONEPANEL_WEBHOOK }}
+        run: |
+          echo "Notifying 1Panel webhook to pull image: $IMAGE"
+          # POST body can be adjusted to match your 1Panel webhook format
+          curl -sSf -X POST -H "Content-Type: application/json" -d "{\"image\":\"$IMAGE\"}" "$ONEPANEL_WEBHOOK" || echo "1Panel webhook returned non-zero"

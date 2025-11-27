@@ -19,3 +19,8 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Ignore deploy production env file (example kept separately)
+deploy/.env.prod
+*.bak-*
+.next.bak*

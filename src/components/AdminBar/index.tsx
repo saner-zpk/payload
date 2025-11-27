@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import type { PayloadAdminBarProps, PayloadMeUser } from '@payloadcms/admin-bar'
 
@@ -15,31 +15,22 @@ import { getClientSideURL } from '@/utilities/getURL'
 const baseClass = 'admin-bar'
 
 const collectionLabels = {
-  pages: {
-    plural: 'Pages',
-    singular: 'Page',
-  },
-  posts: {
-    plural: 'Posts',
-    singular: 'Post',
-  },
-  projects: {
-    plural: 'Projects',
-    singular: 'Project',
-  },
+  pages: { plural: 'Pages', singular: 'Page' },
+  posts: { plural: 'Posts', singular: 'Post' },
+  projects: { plural: 'Projects', singular: 'Project' },
 }
 
-const Title: React.FC = () => <span>Dashboard</span>
+const Title: React.FC = () => (
+  <div className="admin-bar__title">
+    <img src="/media/saner-zpk-avatar-300x199.jpg" alt="logo" style={{ height: 28, borderRadius: 6 }} />
+  </div>
+)
 
-export const AdminBar: React.FC<{
-  adminBarProps?: PayloadAdminBarProps
-}> = (props) => {
+export const AdminBar: React.FC<{ adminBarProps?: PayloadAdminBarProps }> = (props) => {
   const { adminBarProps } = props || {}
   const segments = useSelectedLayoutSegments()
   const [show, setShow] = useState(false)
-  const collection = (
-    collectionLabels[segments?.[1] as keyof typeof collectionLabels] ? segments[1] : 'pages'
-  ) as keyof typeof collectionLabels
+  const collection = (collectionLabels[segments?.[1] as keyof typeof collectionLabels] ? segments[1] : 'pages') as keyof typeof collectionLabels
   const router = useRouter()
 
   const onAuthChange = React.useCallback((user: PayloadMeUser) => {
@@ -47,43 +38,11 @@ export const AdminBar: React.FC<{
   }, [])
 
   return (
-    <div
-      className={cn(baseClass, 'py-2 bg-black text-white', {
-        block: show,
-        hidden: !show,
-      })}
-    >
+    <div className={cn(baseClass, 'py-2 bg-black text-white', { block: show, hidden: !show })}>
       <div className="container">
-        <PayloadAdminBar
-          {...adminBarProps}
-          className="py-2 text-white"
-          classNames={{
-            controls: 'font-medium text-white',
-            logo: 'text-white',
-            user: 'text-white',
-          }}
-          cmsURL={getClientSideURL()}
-          collectionSlug={collection}
-          collectionLabels={{
-            plural: collectionLabels[collection]?.plural || 'Pages',
-            singular: collectionLabels[collection]?.singular || 'Page',
-          }}
-          logo={<Title />}
-          onAuthChange={onAuthChange}
-          onPreviewExit={() => {
-            fetch('/next/exit-preview').then(() => {
-              router.push('/')
-              router.refresh()
-            })
-          }}
-          style={{
-            backgroundColor: 'transparent',
-            padding: 0,
-            position: 'relative',
-            zIndex: 'unset',
-          }}
-        />
+        <PayloadAdminBar cmsURL={getClientSideURL()} collectionSlug={collection} className="py-2 text-white" logo={<Title />} onAuthChange={onAuthChange} />
       </div>
     </div>
   )
 }
+
